@@ -22,7 +22,7 @@ cpcRes      <- 0.25 # data resolution
 cpcLatVec   <- 20.125 + (1:cpcNumLat)*cpcRes - cpcRes # latitudes
 cpcLonVec   <- -129.875 + (1:cpcNumLon)*cpcRes - cpcRes # longitudes
 
-
+#upload dataset to google drive
 precipitation_data<- readRDS('1948_2022_precipitation_data.rds')
 
 
