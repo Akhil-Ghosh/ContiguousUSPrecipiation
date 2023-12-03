@@ -1,7 +1,16 @@
 
 function(input, output, session) {
   # Render plot_annual_precipitation_range
+  current_plot <- reactiveVal("range")
 
+  observeEvent(input$toggle_plot, {
+    if(current_plot() == "range") {
+      current_plot("US")
+    } else {
+      current_plot("range")
+    }
+  })
+  
   
   start_year <- reactive({ input$start_year })
   end_year <- reactive({ input$end_year })
@@ -14,9 +23,18 @@ function(input, output, session) {
   
   perc <- reactive({input$percentile})
   p_matrix <- reactive({get_Xth_percentile(percentile=perc())})
+  
+  
+  #plotting cumulative range:
+  
   output$annual_plot <- renderPlot({
-    plot_annual_precipitation_range(start_year(), end_year(), start_month(), end_month())
+    if(current_plot() == "range") {
+      plot_annual_precipitation_range(start_year(), end_year(), start_month(), end_month())
+    } else {
+      plot_annual_precipitation_US(start_year(), end_year(), start_month(), end_month())
+    }
   })
+  
   
   # Render plot_extreme_events_US
   output$extreme_plot <- renderPlot({
