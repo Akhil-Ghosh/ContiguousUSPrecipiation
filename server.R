@@ -1,8 +1,8 @@
-
 function(input, output, session) {
-  # Render plot_annual_precipitation_range
+  # Reactive value to toggle between plots
   current_plot <- reactiveVal("range")
-
+  
+  # Observe event for the toggle plot button
   observeEvent(input$toggle_plot, {
     if(current_plot() == "range") {
       current_plot("US")
@@ -11,22 +11,24 @@ function(input, output, session) {
     }
   })
   
+  # Extracting year and month from date inputs
+  start_year <- reactive({ as.numeric(format(as.Date(input$start_date), "%Y")) })
+  end_year <- reactive({ as.numeric(format(as.Date(input$end_date), "%Y")) })
+  start_month <- reactive({ format(as.Date(input$start_date), "%b") })
+  end_month <- reactive({ format(as.Date(input$end_date), "%b") })
   
-  start_year <- reactive({ input$start_year })
-  end_year <- reactive({ input$end_year })
-  start_month <- reactive({ input$start_month })
-  end_month <- reactive({ input$end_month })
-
-  year_day <- reactive({ input$year_day })
-  month_day <- reactive({ input$month_day })
-  day_day <- reactive({ input$day_day })
+  # Existing reactive expressions for plot_day_interactive
   
-  perc <- reactive({input$percentile})
-  p_matrix <- reactive({get_Xth_percentile(percentile=perc())})
+  year_day <- reactive({ as.numeric(format(as.Date(input$day_date), "%Y")) })
+  month_day <- reactive({ format(as.Date(input$day_date), "%b") })
+  day_day <- reactive({ as.numeric(format(as.Date(input$day_date), "%d")) })
   
   
-  #plotting cumulative range:
+  # Existing reactive expression for plot_extreme_events_US
+  perc <- reactive({ input$percentile })
+  p_matrix <- reactive({ get_Xth_percentile(percentile = perc()) })
   
+  # Render plot_annual_precipitation_range or plot_annual_precipitation_US
   output$annual_plot <- renderPlot({
     if(current_plot() == "range") {
       plot_annual_precipitation_range(start_year(), end_year(), start_month(), end_month())
@@ -34,7 +36,6 @@ function(input, output, session) {
       plot_annual_precipitation_US(start_year(), end_year(), start_month(), end_month())
     }
   })
-  
   
   # Render plot_extreme_events_US
   output$extreme_plot <- renderPlot({
