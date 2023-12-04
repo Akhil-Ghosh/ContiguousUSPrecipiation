@@ -117,15 +117,14 @@ plot_annual_precipitation_US <- function(start_year, end_year, start_month, end_
   if(start_year == end_year){
     # two edge cases for start_year == end_year
     if(start_month == end_month){
-      year_month_data <- precipitation_data[[as.character(year)]][[start_month]][start_day:end_day]
+      year_month_data <- precipitation_data[[as.character(start_year)]][[start_month]][start_day:end_day]
       overall_cumulative <- Reduce(`+`, year_month_data)
       
-    }
-    else{
-      yearly_data <- precipitation_data[[as.character(year)]]
+    }else{
+      yearly_data <- precipitation_data[[as.character(start_year)]]
       valid_months <- names(yearly_data)[month_order[names(yearly_data)] <= month_order[end_month] & month_order[names(yearly_data)] >= month_order[start_month]]
       
-      monthly_data <- precipitation_data[[as.character(year)]][valid_months]
+      monthly_data <- precipitation_data[[as.character(start_year)]][valid_months]
       monthly_data[[start_month]] <- monthly_data[[start_month]][start_day:length(monthly_data[[start_month]])]
       monthly_data[[end_month]] <- monthly_data[[end_month]][1:end_day]
       
@@ -168,7 +167,6 @@ plot_annual_precipitation_US <- function(start_year, end_year, start_month, end_
       }
     }
     overall_cumulative <- Reduce(`+`, cumulative_data_list)
-    print((cumulative_data_list))
   }
   
   

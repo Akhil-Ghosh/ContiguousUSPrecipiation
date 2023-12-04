@@ -9,7 +9,6 @@ fluidPage(
         dateInput("end_date", "End Date", value = "2022-01-02", startview = "year"),
         numericInput("min_precip", "Minimum Precipitation (mm)", value = 0),
         numericInput("max_precip", "Maximum Precipitation (mm)", value = 1000),
-        actionButton("update_plot", "Update Plot"),
         actionButton("toggle_plot", "Toggle Plot"),
         downloadButton("save_plot", "Save Plot"),
         textOutput("current_plot_label")

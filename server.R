@@ -51,4 +51,5 @@ function(input, output, session) {
   output$day_plot <- renderPlotly({
     plot_day_interactive(year_day(), month_day(), day_day())
   })
+  
 }
