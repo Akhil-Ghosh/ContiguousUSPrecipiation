@@ -16,6 +16,9 @@ function(input, output, session) {
   end_year <- reactive({ as.numeric(format(as.Date(input$end_date), "%Y")) })
   start_month <- reactive({ format(as.Date(input$start_date), "%b") })
   end_month <- reactive({ format(as.Date(input$end_date), "%b") })
+  start_day <- reactive({ as.numeric(format(as.Date(input$start_date), "%d")) })
+  end_day <- reactive({ as.numeric(format(as.Date(input$end_date), "%d")) })
+  
   min_precip <- reactive({ input$min_precip })
   max_precip <- reactive({ input$max_precip })
   
@@ -33,9 +36,9 @@ function(input, output, session) {
   # Render plot_annual_precipitation_range or plot_annual_precipitation_US
   output$annual_plot <- renderPlot({
     if(current_plot() == "range") {
-      plot_annual_precipitation_range(start_year(), end_year(), start_month(), end_month(), min_precip(), max_precip())
+      plot_annual_precipitation_range(start_year(), end_year(), start_month(), end_month(), start_day(),end_day(),min_precip(), max_precip())
     } else {
-      plot_annual_precipitation_US(start_year(), end_year(), start_month(), end_month(), min_precip(), max_precip())
+      plot_annual_precipitation_US(start_year(), end_year(), start_month(), end_month(),start_day(),end_day(), min_precip(), max_precip())
     }
   })
   

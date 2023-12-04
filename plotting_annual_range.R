@@ -16,37 +16,70 @@ cpcLatVec   <- 20.125 + (1:cpcNumLat)*cpcRes - cpcRes # latitudes
 cpcLonVec   <- -129.875 + (1:cpcNumLon)*cpcRes - cpcRes # longitudes
 
 
-plot_annual_precipitation_range <- function(start_year, end_year, start_month, end_month, min_precip, max_precip) {
+plot_annual_precipitation_range <- function(start_year, end_year, start_month, end_month, start_day, end_day, min_precip, max_precip) {
+  # Initialize an empty list to store the cumulative data for each year
   # Initialize an empty list to store the cumulative data for each year
   month_order <- c("Jan" = 1, "Feb" = 2, "Mar" = 3, "Apr" = 4, "May" = 5, 
-                 "Jun" = 6, "Jul" = 7, "Aug" = 8, "Sep" = 9, "Oct" = 10, 
-                 "Nov" = 11, "Dec" = 12)
-  cumulative_data_list <- list()
+                   "Jun" = 6, "Jul" = 7, "Aug" = 8, "Sep" = 9, "Oct" = 10, 
+                   "Nov" = 11, "Dec" = 12)
   
-  # Loop over the range of years
-  for (year in start_year:end_year) {
-    # Extract the data for the current year
-    yearly_data <- precipitation_data[[as.character(year)]]
-    
-    # Based on the given year, determine the range of months to consider
-    if (year == start_year) {
-      month_names <- names(yearly_data)[month_order[names(yearly_data)] >= month_order[start_month]]
-    } else if (year == end_year) {
-      month_names <- names(yearly_data)[month_order[names(yearly_data)] <= month_order[end_month]]
-    } else {
-      month_names <- names(yearly_data)
+  cumulative_data_list <- list()
+  if(start_year == end_year){
+    # two edge cases for start_year == end_year
+    if(start_month == end_month){
+      year_month_data <- precipitation_data[[as.character(year)]][[start_month]][start_day:end_day]
+      overall_cumulative <- Reduce(`+`, year_month_data)
+      
+    }
+    else{
+      yearly_data <- precipitation_data[[as.character(year)]]
+      valid_months <- names(yearly_data)[month_order[names(yearly_data)] <= month_order[end_month] & month_order[names(yearly_data)] >= month_order[start_month]]
+      
+      monthly_data <- precipitation_data[[as.character(year)]][valid_months]
+      monthly_data[[start_month]] <- monthly_data[[start_month]][start_day:length(monthly_data[[start_month]])]
+      monthly_data[[end_month]] <- monthly_data[[end_month]][1:end_day]
+      
+      overall_cumulative <-  Reduce(`+`, lapply(monthly_data, function(month_data) {
+        Reduce(`+`, month_data)
+      }))
     }
     
-    # Extract data for the months of interest and compute cumulative precipitation
-    selected_month_data <- yearly_data[month_names]
-    yearly_cumulative <- Reduce(`+`, lapply(selected_month_data, function(month_data) {
-      Reduce(`+`, month_data)
-    }))
-    cumulative_data_list[[as.character(year)]] <- yearly_cumulative
+  }else{
+    # Loop over the range of years
+    for (year in start_year:end_year) {
+      if(year == start_year){
+        yearly_data <- precipitation_data[[as.character(year)]]
+        month_names <- names(yearly_data)[month_order[names(yearly_data)] >= month_order[start_month]]
+        valid_months <- month_order[names(yearly_data)] >= month_order[start_month]
+        monthly_data <- yearly_data[valid_months]
+        monthly_data[[start_month]] <- monthly_data[[start_month]][start_day:length(monthly_data[[start_month]])]
+        
+        yearly_cumulative <- Reduce(`+`, lapply(monthly_data, function(month_data) {
+          Reduce(`+`, month_data)
+        }))
+        cumulative_data_list[[as.character(year)]] <- yearly_cumulative
+      }else if(year == end_year){
+        yearly_data <- precipitation_data[[as.character(year)]]
+        valid_months <- month_order[names(yearly_data)] <= month_order[end_month]
+        monthly_data <- yearly_data[valid_months]
+        monthly_data[[end_month]] <- monthly_data[[end_month]][1:end_day]
+        
+        yearly_cumulative <- Reduce(`+`, lapply(monthly_data, function(month_data) {
+          Reduce(`+`, month_data)
+        }))
+        cumulative_data_list[[as.character(year)]] <- yearly_cumulative
+      }
+      else{
+        yearly_data <- precipitation_data[[as.character(year)]]
+        yearly_cumulative <- Reduce(`+`, lapply(monthly_data, function(month_data) {
+          Reduce(`+`, month_data)
+        }))
+        cumulative_data_list[[as.character(year)]]  <- yearly_cumulative
+      }
+    }
+    overall_cumulative <- Reduce(`+`, cumulative_data_list)
   }
   
-  # Combine the cumulative data across years
-  overall_cumulative <- Reduce(`+`, cumulative_data_list)
   
   r <- raster(overall_cumulative, xmn=min(cpcLonVec), xmx=max(cpcLonVec), ymn=min(cpcLatVec), ymx=max(cpcLatVec))
   
@@ -73,37 +106,71 @@ plot_annual_precipitation_range <- function(start_year, end_year, start_month, e
 }
 
 
-plot_annual_precipitation_US <- function(start_year, end_year, start_month, end_month, min_precip, max_precip) {
+plot_annual_precipitation_US <- function(start_year, end_year, start_month, end_month, start_day, end_day, min_precip, max_precip) {
+  # Initialize an empty list to store the cumulative data for each year
   # Initialize an empty list to store the cumulative data for each year
   month_order <- c("Jan" = 1, "Feb" = 2, "Mar" = 3, "Apr" = 4, "May" = 5, 
                    "Jun" = 6, "Jul" = 7, "Aug" = 8, "Sep" = 9, "Oct" = 10, 
                    "Nov" = 11, "Dec" = 12)
-  cumulative_data_list <- list()
   
-  # Loop over the range of years
-  for (year in start_year:end_year) {
-    # Extract the data for the current year
-    yearly_data <- precipitation_data[[as.character(year)]]
-    
-    # Determine the range of months to consider for each year
-    if (year == start_year) {
-      month_names <- names(yearly_data)[month_order[names(yearly_data)] >= month_order[start_month]]
-    } else if (year == end_year) {
-      month_names <- names(yearly_data)[month_order[names(yearly_data)] <= month_order[end_month]]
-    } else {
-      month_names <- names(yearly_data)
+  cumulative_data_list <- list()
+  if(start_year == end_year){
+    # two edge cases for start_year == end_year
+    if(start_month == end_month){
+      year_month_data <- precipitation_data[[as.character(year)]][[start_month]][start_day:end_day]
+      overall_cumulative <- Reduce(`+`, year_month_data)
+      
+    }
+    else{
+      yearly_data <- precipitation_data[[as.character(year)]]
+      valid_months <- names(yearly_data)[month_order[names(yearly_data)] <= month_order[end_month] & month_order[names(yearly_data)] >= month_order[start_month]]
+      
+      monthly_data <- precipitation_data[[as.character(year)]][valid_months]
+      monthly_data[[start_month]] <- monthly_data[[start_month]][start_day:length(monthly_data[[start_month]])]
+      monthly_data[[end_month]] <- monthly_data[[end_month]][1:end_day]
+      
+      overall_cumulative <-  Reduce(`+`, lapply(monthly_data, function(month_data) {
+        Reduce(`+`, month_data)
+      }))
     }
     
-    # Extract data for the months of interest and compute cumulative precipitation
-    selected_month_data <- yearly_data[month_names]
-    yearly_cumulative <- Reduce(`+`, lapply(selected_month_data, function(month_data) {
-      Reduce(`+`, month_data)
-    }))
-    cumulative_data_list[[as.character(year)]] <- yearly_cumulative
+  }else{
+    # Loop over the range of years
+    for (year in start_year:end_year) {
+      if(year == start_year){
+        yearly_data <- precipitation_data[[as.character(year)]]
+        month_names <- names(yearly_data)[month_order[names(yearly_data)] >= month_order[start_month]]
+        valid_months <- month_order[names(yearly_data)] >= month_order[start_month]
+        monthly_data <- yearly_data[valid_months]
+        monthly_data[[start_month]] <- monthly_data[[start_month]][start_day:length(monthly_data[[start_month]])]
+        
+        yearly_cumulative <- Reduce(`+`, lapply(monthly_data, function(month_data) {
+          Reduce(`+`, month_data)
+        }))
+        cumulative_data_list[[as.character(year)]] <- yearly_cumulative
+      }else if(year == end_year){
+        yearly_data <- precipitation_data[[as.character(year)]]
+        valid_months <- month_order[names(yearly_data)] <= month_order[end_month]
+        monthly_data <- yearly_data[valid_months]
+        monthly_data[[end_month]] <- monthly_data[[end_month]][1:end_day]
+        
+        yearly_cumulative <- Reduce(`+`, lapply(monthly_data, function(month_data) {
+          Reduce(`+`, month_data)
+        }))
+        cumulative_data_list[[as.character(year)]] <- yearly_cumulative
+      }
+      else{
+        yearly_data <- precipitation_data[[as.character(year)]]
+        yearly_cumulative <- Reduce(`+`, lapply(monthly_data, function(month_data) {
+          Reduce(`+`, month_data)
+        }))
+        cumulative_data_list[[as.character(year)]]  <- yearly_cumulative
+      }
+    }
+    overall_cumulative <- Reduce(`+`, cumulative_data_list)
+    print((cumulative_data_list))
   }
   
-  # Combine the cumulative data across years
-  overall_cumulative <- Reduce(`+`, cumulative_data_list)
   
   # Create a raster object from the cumulative precipitation data
   r <- raster(overall_cumulative, xmn=min(cpcLonVec), xmx=max(cpcLonVec), ymn=min(cpcLatVec), ymx=max(cpcLatVec))
@@ -126,12 +193,11 @@ plot_annual_precipitation_US <- function(start_year, end_year, start_month, end_
                          name = "Precipitation (mm)",
                          oob = scales::squish,
                          limits = c(min_precip, max_precip)) +
-    labs(title = paste("Cumulative Precipitation (mm) from", start_month, start_year, "to", end_month, end_year),
+    labs(title = paste("Cumulative Precipitation (mm) from", start_month,start_day, start_year, "to", end_month,end_day, end_year),
          x = "Longitude",
          y = "Latitude") +
     theme_minimal() +
     coord_sf(expand = FALSE, xlim = c(-125, -66), ylim = c(24, 49)) # Adjusted limits for the entire contiguous U.S.
   return(p)
 }
-
 
