@@ -27,7 +27,7 @@ get_Xth_percentile <- function(percentile, year1=1950,year2=1979) {
   }))
   
   # Dimensions of a single day's data
-  day_dims <- dim(precipitation_data$`1950`$Jan$`1`)
+  day_dims <- c(120,300)
   num_lat_lon_pairs <- prod(day_dims)
   
   data_matrix <- matrix(NA, nrow=num_lat_lon_pairs, ncol=num_days)
@@ -98,7 +98,7 @@ plot_extreme_events <- function(year, percentile_matrix) {
 
 plot_extreme_events_US <- function(year, percentile_matrix) {
   # Reshape the percentile_95 vector back to matrix form
-  day_dims <- dim(precipitation_data$`1950`$Jan$`1`)
+  day_dims <- c(120, 300)
 
     # Get data for the given year and calculate extreme events
   yearly_data <- precipitation_data[[as.character(year)]]

@@ -329,7 +329,5 @@ max_precip = 2000
     coord_sf(expand = FALSE, xlim = c(-125, -66), ylim = c(24, 49)) # Adjusted limits for the entire contiguous U.S.
   p
 
-  
-
 ```
 
