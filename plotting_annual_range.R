@@ -16,7 +16,7 @@ cpcLatVec   <- 20.125 + (1:cpcNumLat)*cpcRes - cpcRes # latitudes
 cpcLonVec   <- -129.875 + (1:cpcNumLon)*cpcRes - cpcRes # longitudes
 
 
-plot_annual_precipitation_range <- function(start_year, end_year, start_month, end_month) {
+plot_annual_precipitation_range <- function(start_year, end_year, start_month, end_month, min_precip, max_precip) {
   # Initialize an empty list to store the cumulative data for each year
   month_order <- c("Jan" = 1, "Feb" = 2, "Mar" = 3, "Apr" = 4, "May" = 5, 
                  "Jun" = 6, "Jul" = 7, "Aug" = 8, "Sep" = 9, "Oct" = 10, 
@@ -62,7 +62,8 @@ plot_annual_precipitation_range <- function(start_year, end_year, start_month, e
       geom_sf(data = states, color = "black", fill = NA) +
       scale_fill_gradientn(colors = c("red", "yellow", "cyan", "blue"), 
                            name = "Precipitation (mm)",
-                           oob = scales::squish) +
+                           oob = scales::squish,
+                           limits = c(min_precip, max_precip)) +
       labs(title = paste("Cumulative Precipitation (mm) from", start_month, start_year, "to", end_month, end_year),
            x = "Longitude",
            y = "Latitude") +
@@ -72,7 +73,7 @@ plot_annual_precipitation_range <- function(start_year, end_year, start_month, e
 }
 
 
-plot_annual_precipitation_US <- function(start_year, end_year, start_month, end_month) {
+plot_annual_precipitation_US <- function(start_year, end_year, start_month, end_month, min_precip, max_precip) {
   # Initialize an empty list to store the cumulative data for each year
   month_order <- c("Jan" = 1, "Feb" = 2, "Mar" = 3, "Apr" = 4, "May" = 5, 
                    "Jun" = 6, "Jul" = 7, "Aug" = 8, "Sep" = 9, "Oct" = 10, 
@@ -123,7 +124,8 @@ plot_annual_precipitation_US <- function(start_year, end_year, start_month, end_
     geom_sf(data = states, color = "black", fill = NA) +
     scale_fill_gradientn(colors = c("red", "yellow", "cyan", "blue"), 
                          name = "Precipitation (mm)",
-                         oob = scales::squish) +
+                         oob = scales::squish,
+                         limits = c(min_precip, max_precip)) +
     labs(title = paste("Cumulative Precipitation (mm) from", start_month, start_year, "to", end_month, end_year),
          x = "Longitude",
          y = "Latitude") +
