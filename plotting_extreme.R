@@ -96,7 +96,7 @@ plot_extreme_events <- function(year, percentile_matrix) {
   return(p)
 }
 
-plot_extreme_events_US <- function(year, percentile_matrix) {
+plot_extreme_events_US <- function(year, percentile_matrix,lim = 10) {
   # Reshape the percentile_95 vector back to matrix form
   day_dims <- c(120, 300)
 
@@ -123,7 +123,7 @@ plot_extreme_events_US <- function(year, percentile_matrix) {
     geom_sf(data = states, color = "black", fill = NA) +
     scale_fill_gradientn(colors = c("red", "yellow", "cyan", "blue"), 
                          name = "Extreme Events Count",
-                         limits = c(0,10),
+                         limits = c(0,lim),
                          oob = scales::squish) +  # Setting fixed limits here
     labs(title = paste("Extreme Precipitation Events in", year),
          x = "Longitude",

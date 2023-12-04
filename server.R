@@ -32,6 +32,7 @@ function(input, output, session) {
   # Existing reactive expression for plot_extreme_events_US
   perc <- reactive({ input$percentile })
   p_matrix <- reactive({ get_Xth_percentile(percentile = perc()) })
+  scale_limit <- reactive({ input$limits })
   
   # Render plot_annual_precipitation_range or plot_annual_precipitation_US
   output$annual_plot <- renderPlot({
@@ -44,7 +45,7 @@ function(input, output, session) {
   
   # Render plot_extreme_events_US
   output$extreme_plot <- renderPlot({
-    plot_extreme_events_US(input$year_extreme, p_matrix())
+    plot_extreme_events_US(input$year_extreme, p_matrix(), scale_limit())
   })
   
   # Render plot_day_interactive
